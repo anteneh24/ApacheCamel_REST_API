@@ -2,28 +2,53 @@
 <!-- Configures the Camel Context-->
 
 <beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:cxf="http://www.springframework.org/schema/c"
        xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
        http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd">
+
+  <!-- Incoming request as end point, for other systems -->
+  <cxf:cxfEndpoint id="requestInComing"
+    address="http://0.0.0.0:7271/request"
+    >
+    <cxf:inInterceptors>
+    <ref bean="loggingInInterceptor"/>
+    </cxf:inInterceptors>
+    <cxf:outInterceptors>
+    <ref bean="loggingOutInterceptor"/>
+    </cxf:outInterceptors>
+    <cxf:outFaultInterceptors>
+    <ref bean="loggingOutInterceptor"/>
+    </cxf:outFaultInterceptors>
+    <cxf:inFaultInterceptors>
+    <ref bean="loggingInInterceptor"/>
+    </cxf:inFaultInterceptors>
+  </cxf:cxfEndpoint>
+
+<!--
+  for intercepting incoming logs so that we can log it
+-->
+  <bean id="loggingFeature" class="org.apache.cxf.feature.LoggingFeature">
+    <property name="prettyLogging" value="true" />
+  </bean>
+  <bean id="loggingOutInterceptor" class="org.apache.cxf.interceptor.LoggingOutInterceptor">
+    <property name="prettyLogging" value="true" />
+  </bean>
+  <bean id="loggingInInterceptor" class="org.apache.cxf.interceptor.LoggingInInterceptor">
+    <property name="prettyLogging" value="true" />
+  </bean>
+
+  <bean name="RequestEndPoint" class="RestExample.RequestEndPoint"/>
 
   <camelContext xmlns="http://camel.apache.org/schema/spring">
     <!-- here is a sample which processes the input files
          (leaving them in place - see the 'noop' flag)
          then performs content based routing on the message using XPath -->
-    <route>
-      <from uri="file:src/data?noop=true"/>
-      <choice>
-        <when>
-          <xpath>/person/city = 'London'</xpath>
-          <log message="UK message"/>
-          <to uri="file:target/messages/uk"/>
-        </when>
-        <otherwise>
-          <log message="Other message"/>
-          <to uri="file:target/messages/others"/>
-        </otherwise>
-      </choice>
+
+    <route id="incoming">
+      <from uri="cxf:bean:requestInComing"/>  <!-- Enter into this route when a request comes -->
+      <process ref="RequestEndPoint"/>
+      <setBody><constant>The request has been successfully accepted!</constant></setBody>
     </route>
   </camelContext>
 

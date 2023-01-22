@@ -14,6 +14,8 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <log4j2-version>2.13.3</log4j2-version>
+    <cxf.version>3.4.4</cxf.version>
+
   </properties>
 
   <dependencyManagement>
@@ -43,6 +45,30 @@
       <artifactId>camel-spring-main</artifactId>
     </dependency>
 
+    <!--CXF-->
+    <dependency>
+      <groupId>org.apache.camel</groupId>
+      <artifactId>camel-cxf</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.camel</groupId>
+      <artifactId>camel-cxf-transport</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.cxf</groupId>
+      <artifactId>cxf-rt-frontend-jaxws</artifactId>
+      <version>${cxf.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.cxf</groupId>
+      <artifactId>cxf-rt-transports-http</artifactId>
+      <version>${cxf.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.cxf</groupId>
+      <artifactId>cxf-rt-transports-http-jetty</artifactId>
+      <version>${cxf.version}</version>
+    </dependency>
     <!-- logging -->
     <dependency>
       <groupId>org.apache.logging.log4j</groupId>
